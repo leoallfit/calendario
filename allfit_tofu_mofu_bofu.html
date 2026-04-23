@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AllFit — Plan TOFU·MOFU·BOFU</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --card: #111;
+  --card2: #161616;
+  --orange: #e8500a;
+  --gold: #f5a623;
+  --tofu: #3b82f6;
+  --mofu: #f5a623;
+  --bofu: #e8500a;
+  --white: #f0ede8;
+  --muted: #555;
+  --border: #1e1e1e;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--white); font-family:'DM Sans',sans-serif; padding-bottom:80px; }
+
+/* HEADER */
+header {
+  padding: 28px 20px 0;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top:0; background:#0a0a0aee;
+  backdrop-filter: blur(14px); z-index:100;
+}
+.brand { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:4px; color:var(--orange); }
+.header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.header-right { display:flex; gap:8px; }
+.pill {
+  font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  padding:4px 10px; border-radius:20px;
+}
+.pill-tofu { background:rgba(59,130,246,0.15); color:var(--tofu); }
+.pill-mofu { background:rgba(245,166,35,0.15); color:var(--mofu); }
+.pill-bofu { background:rgba(232,80,10,0.15); color:var(--bofu); }
+
+/* TABS */
+.tabs { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding-bottom:0; }
+.tabs::-webkit-scrollbar { display:none; }
+.tab {
+  flex-shrink:0; padding:10px 18px;
+  font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:2px;
+  color:var(--muted); border-bottom:2px solid transparent;
+  cursor:pointer; transition:all .2s; background:none; border-left:none; border-right:none; border-top:none;
+}
+.tab.active { color:var(--white); border-bottom-color:var(--orange); }
+.tab:hover:not(.active) { color:#aaa; }
+
+/* PANELS */
+.panel { display:none; padding:20px; }
+.panel.active { display:block; }
+
+/* CALENDAR VIEW */
+.cal-grid {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:8px;
+  margin-bottom:6px;
+}
+.cal-label {
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); text-align:center; padding:6px 0;
+}
+.cal-card {
+  border-radius:10px; padding:12px 10px; cursor:pointer;
+  border:1px solid var(--border); background:var(--card);
+  transition:all .18s; text-align:center;
+}
+.cal-card:hover { transform:translateY(-2px); }
+.cal-card.tofu { border-top:3px solid var(--tofu); }
+.cal-card.mofu { border-top:3px solid var(--mofu); }
+.cal-card.bofu { border-top:3px solid var(--bofu); }
+.cal-day { font-size:10px; color:var(--muted); margin-bottom:4px; letter-spacing:1px; }
+.cal-num { font-family:'Bebas Neue',sans-serif; font-size:22px; line-height:1; margin-bottom:6px; }
+.cal-num.tofu { color:var(--tofu); }
+.cal-num.mofu { color:var(--mofu); }
+.cal-num.bofu { color:var(--bofu); }
+.cal-title { font-size:11px; line-height:1.4; color:#ccc; }
+.cal-tag {
+  display:inline-block; margin-top:6px;
+  font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  padding:2px 7px; border-radius:10px;
+}
+.cal-tag.tofu { background:rgba(59,130,246,0.15); color:var(--tofu); }
+.cal-tag.mofu { background:rgba(245,166,35,0.15); color:var(--mofu); }
+.cal-tag.bofu { background:rgba(232,80,10,0.2); color:var(--bofu); }
+
+.week-row { margin-bottom:16px; }
+.week-label {
+  font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:3px;
+  color:var(--muted); margin-bottom:8px;
+}
+
+/* LEGEND */
+.legend { display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap; }
+.legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+.legend-dot { width:8px; height:8px; border-radius:50%; }
+
+/* SCRIPTS VIEW */
+.funnel-section { margin-bottom:32px; }
+.funnel-header {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border);
+}
+.funnel-icon { font-size:28px; }
+.funnel-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; }
+.funnel-title.tofu { color:var(--tofu); }
+.funnel-title.mofu { color:var(--mofu); }
+.funnel-title.bofu { color:var(--bofu); }
+.funnel-desc { font-size:13px; color:var(--muted); margin-top:2px; }
+
+.script-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:12px; margin-bottom:12px; overflow:hidden;
+}
+.script-card.tofu { border-left:3px solid var(--tofu); }
+.script-card.mofu { border-left:3px solid var(--mofu); }
+.script-card.bofu { border-left:3px solid var(--bofu); }
+
+.sc-header {
+  display:flex; align-items:flex-start; gap:12px;
+  padding:16px; cursor:pointer;
+}
+.sc-num {
+  font-family:'Bebas Neue',sans-serif; font-size:28px; line-height:1; flex-shrink:0; margin-top:2px;
+}
+.sc-num.tofu { color:var(--tofu); }
+.sc-num.mofu { color:var(--mofu); }
+.sc-num.bofu { color:var(--bofu); }
+.sc-meta { flex:1; }
+.sc-hook { font-size:15px; font-weight:600; color:var(--white); line-height:1.4; margin-bottom:4px; }
+.sc-tags { display:flex; gap:6px; flex-wrap:wrap; }
+.sc-tag {
+  font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  padding:3px 8px; border-radius:4px;
+}
+.sc-tag.week { background:#1e1e1e; color:var(--muted); }
+.sc-tag.type { background:#1a1a1a; color:#888; }
+.sc-toggle { font-size:20px; color:var(--muted); flex-shrink:0; transition:transform .25s; margin-top:2px; }
+.script-card.open .sc-toggle { transform:rotate(45deg); color:var(--orange); }
+
+.sc-body { display:none; padding:0 16px 16px; }
+.script-card.open .sc-body { display:block; }
+.sc-divider { height:1px; background:var(--border); margin-bottom:14px; }
+
+.script-block {
+  background:var(--card2); border-radius:8px; padding:12px 14px; margin-bottom:10px;
+}
+.sb-label {
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:8px;
+}
+.sb-label.tofu { color:var(--tofu); }
+.sb-label.mofu { color:var(--mofu); }
+.sb-label.bofu { color:var(--bofu); }
+.sb-text { font-size:14px; color:#bbb; line-height:1.75; white-space:pre-wrap; }
+
+.cta-box {
+  border-radius:8px; padding:12px 14px; margin-bottom:10px;
+}
+.cta-box.tofu { background:rgba(59,130,246,0.07); border:1px solid rgba(59,130,246,0.2); }
+.cta-box.mofu { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.cta-box.bofu { background:rgba(232,80,10,0.1); border:1px solid rgba(232,80,10,0.3); }
+
+.cta-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.cta-label.tofu { color:var(--tofu); }
+.cta-label.mofu { color:var(--mofu); }
+.cta-label.bofu { color:var(--bofu); }
+.cta-text { font-size:14px; font-weight:600; color:var(--white); line-height:1.5; }
+
+.copy-btn {
+  background:var(--orange); color:#fff; border:none; border-radius:8px;
+  padding:9px 16px; font-size:12px; font-weight:600; letter-spacing:.5px;
+  cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity .2s;
+  display:flex; align-items:center; gap:6px;
+}
+.copy-btn:hover { opacity:.85; }
+.copy-btn.copied { background:#2a7a2a; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-row">
+    <div class="brand">ALLFIT</div>
+    <div class="header-right">
+      <span class="pill pill-tofu">TOFU</span>
+      <span class="pill pill-mofu">MOFU</span>
+      <span class="pill pill-bofu">BOFU</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="showTab('cal')">📅 CALENDARIO</div>
+    <div class="tab" onclick="showTab('scripts')">📝 SCRIPTS</div>
+  </div>
+</header>
+
+<div id="cal" class="panel active"></div>
+<div id="scripts" class="panel"></div>
+
+<script>
+const posts = [
+  // SEMANA 1 — TOFU heavy
+  {
+    week:1, day:"LUN", funnel:"tofu", type:"Desmitificación",
+    hook:"Llevás años entrenando duro. Y el músculo no aparece. Esto es lo que nadie te dijo.",
+    hook_full:"Llevás años entrenando duro. Sudás, no faltás, te esforzás. Y el músculo no aparece. Esto es lo que nadie te dijo.",
+    desarrollo:`El músculo no crece porque te esforzás mucho. Crece cuando aplicás el estímulo correcto.
+
+Hay una diferencia enorme entre entrenar con esfuerzo y entrenar con criterio.
+
+La mayoría de los tipos que llevan años sin resultados no tienen problema de disciplina. Tienen problema de método.
+
+No saben qué tan cerca del fallo tienen que llegar en cada serie.
+No saben cuántas series necesitan por músculo por semana.
+No saben si están progresando o dando vueltas en círculos.
+
+Eso no es culpa tuya. Es que nadie te lo enseñó.`,
+    cta:"Si querés entender qué necesita tu cuerpo para realmente crecer, seguime. Esto es exactamente lo que enseño.",
+    keyword:"seguir"
+  },
+  {
+    week:1, day:"MAR", funnel:"tofu", type:"Educativo",
+    hook:"¿Qué es el fallo muscular y por qué es la clave que te falta?",
+    hook_full:"¿Qué es el fallo muscular y por qué es la variable que más impacta en tu crecimiento?",
+    desarrollo:`El fallo muscular es el punto donde ya no podés hacer ni una repetición más con buena técnica.
+
+No es cuando te cansás. No es cuando te arde. Es cuando el músculo literalmente no puede contraerse más.
+
+¿Por qué importa? Porque las últimas repeticiones de cada serie —las que están cerca del fallo— son las que generan el mayor estímulo para el crecimiento.
+
+Si siempre te quedás 5 o 6 repeticiones lejos del fallo, el músculo recibe un estímulo tan bajo que no tiene razón para adaptarse.
+
+Aprender a medir y controlar la intensidad es la habilidad más importante que podés desarrollar en el gym.`,
+    cta:"Guardá este video. Y si querés profundizar, seguime que hay mucho más.",
+    keyword:"guardar"
+  },
+  {
+    week:1, day:"MIÉ", funnel:"tofu", type:"Relatable",
+    hook:"Gym lunes. Mismos ejercicios. Mismos pesos. Mismos resultados (ninguno).",
+    hook_full:"Lunes. Gym. Press de banca. Los mismos 60 kg de siempre. Los mismos resultados de siempre. Nada.",
+    desarrollo:`Si esto te suena familiar, no estás solo.
+
+La mayoría de los tipos que entrenan llevan meses —o años— haciendo exactamente lo mismo y esperando resultados distintos.
+
+El problema no es falta de esfuerzo. Es falta de progresión.
+
+El cuerpo se adapta al estímulo que recibe. Si ese estímulo no cambia con el tiempo, el cuerpo no tiene ninguna razón para cambiar.
+
+La sobrecarga progresiva —aumentar el estímulo semana a semana— es el mecanismo principal de crecimiento muscular a largo plazo.
+
+Sin eso, podés entrenar diez años y quedarte igual.`,
+    cta:"¿Te identificás con esto? Contame en los comentarios cuánto tiempo llevás estancado.",
+    keyword:"comentar"
+  },
+  {
+    week:1, day:"JUE", funnel:"mofu", type:"Educativo",
+    hook:"Volumen de entrenamiento: la variable que más ignoran los que no crecen.",
+    hook_full:"Volumen de entrenamiento: la variable que la mayoría ignora y que explica por qué no crecés.",
+    desarrollo:`El volumen es la cantidad de series efectivas que hacés por grupo muscular por semana.
+
+Tiene un rango óptimo. Abajo del mínimo, no hay estímulo suficiente. Arriba del máximo, el cuerpo no puede recuperarse.
+
+La evidencia actual sugiere entre 10 y 20 series semanales por músculo como punto de partida, dependiendo de tu nivel y tolerancia.
+
+¿El problema? La mayoría no sabe cuántas series está haciendo realmente. Ni si está arriba o abajo del rango.
+
+Medir tu volumen y ajustarlo es una de las cosas más concretas que podés hacer para empezar a progresar.`,
+    cta:"Si querés saber exactamente cuántas series necesitás por músculo, mandame MASA por DM.",
+    keyword:"MASA"
+  },
+  {
+    week:1, day:"VIE", funnel:"tofu", type:"Mito",
+    hook:"\"Sin dolor no hay ganancia\". La frase que más daño le hizo al gimnasio.",
+    hook_full:"\"Sin dolor no hay ganancia\". La frase más repetida del gym... y una de las más dañinas.",
+    desarrollo:`El dolor muscular post-entrenamiento —la famosa agujeta— no es un indicador de que entrenaste bien.
+
+Es simplemente una respuesta inflamatoria a un estímulo al que tu cuerpo no estaba adaptado.
+
+Podés hacer una sesión brillante sin sentir dolor al día siguiente. Y podés sentir dolor horrible después de una sesión que no aportó casi nada.
+
+Buscar el dolor como objetivo te lleva a sobreentrenar, a no poder recuperarte y a lesionarte.
+
+El objetivo del entrenamiento no es el dolor. Es el estímulo correcto aplicado de forma consistente.`,
+    cta:"Seguime si querés aprender a entrenar con criterio, no con ego.",
+    keyword:"seguir"
+  },
+
+  // SEMANA 2 — TOFU + MOFU
+  {
+    week:2, day:"LUN", funnel:"tofu", type:"Educativo",
+    hook:"Patrones de movimiento: por qué importa más que los ejercicios que elegís.",
+    hook_full:"Patrones de movimiento: el concepto que nadie te enseñó y que cambia cómo pensás el entrenamiento.",
+    desarrollo:`Todos los ejercicios que existén caen en uno de estos patrones: empuje, tracción, bisagra, sentadilla, cargada.
+
+Entender esto te permite construir rutinas completas en vez de acumular ejercicios al azar.
+
+Si hacés press plano, press inclinado y press declinado en la misma sesión, estás sobreentrenando el mismo patrón.
+
+Si no incluís ningún ejercicio de tracción vertical, dejás la espalda alta sin trabajar.
+
+La selección inteligente de ejercicios empieza por entender qué patrón cubre cada uno.`,
+    cta:"Guardá esto. Es la base para armar cualquier rutina correctamente.",
+    keyword:"guardar"
+  },
+  {
+    week:2, day:"MAR", funnel:"mofu", type:"Educativo",
+    hook:"Frecuencia de entrenamiento: ¿cada cuánto tenés que entrenar cada músculo?",
+    hook_full:"¿Cuántas veces por semana tenés que entrenar cada músculo para maximizar el crecimiento?",
+    desarrollo:`Un músculo tarda entre 48 y 72 horas en recuperarse del entrenamiento.
+
+Después de ese período, si no lo volvés a estimular, el efecto anabólico del entrenamiento desaparece.
+
+Por eso entrenar cada músculo al menos 2 veces por semana es, en general, más efectivo para hipertrofia que hacerlo una sola vez.
+
+No porque hagás más volumen total, sino porque distribuís ese volumen de forma más inteligente a lo largo de la semana.
+
+Frecuencia 1 —como el clásico pecho lunes, espalda martes— puede funcionar, pero frecuencia 2 generalmente da mejores resultados con el mismo volumen.`,
+    cta:"Si querés saber cómo distribuir tu volumen semanal, mandame MASA por DM.",
+    keyword:"MASA"
+  },
+  {
+    week:2, day:"MIÉ", funnel:"tofu", type:"Relatable",
+    hook:"Cinco ejercicios de bíceps en el mismo entrenamiento. Todos hacemos esto al principio.",
+    hook_full:"Cinco ejercicios distintos de bíceps en el mismo entrenamiento. Todos lo hicimos. El problema es que no sirve.",
+    desarrollo:`No porque el volumen sea malo, sino porque cinco ejercicios de bíceps probablemente cubren todos el mismo patrón de movimiento.
+
+Curl con barra, curl con mancuernas, curl martillo, curl predicador, curl en polea... todos son flexión de codo con supinación.
+
+Más ejercicios no significa más músculo si todos hacen lo mismo.
+
+La variedad inteligente no es cambiar el nombre del ejercicio. Es cambiar el ángulo, el patrón o el estímulo.
+
+Entender esto transforma cómo armás tus entrenamientos.`,
+    cta:"Seguime para aprender a armar rutinas que realmente tengan sentido.",
+    keyword:"seguir"
+  },
+  {
+    week:2, day:"JUE", funnel:"mofu", type:"Educativo",
+    hook:"Splits: PPL, torso/pierna, fullbody. ¿Cuál es mejor? La respuesta honesta.",
+    hook_full:"PPL, torso/pierna, fullbody... ¿cuál es mejor para ganar músculo? La respuesta honesta.",
+    desarrollo:`Ninguno es mejor por sí mismo. Todos funcionan si están bien ejecutados.
+
+Lo que determina qué split es mejor para vos es: cuántos días podés entrenar de forma consistente, si te permite cubrir el volumen semanal necesario para cada músculo, y si podés sostenerlo en el tiempo.
+
+Un PPL de 6 días en papel puede ser mejor que un fullbody de 3... pero si solo podés ir 3 días, el fullbody gana.
+
+El mejor split es el que se adapta a tu vida, no el que suena mejor en internet.`,
+    cta:"Si querés que te ayude a elegir el split correcto para vos, mandame CAMBIO por DM.",
+    keyword:"CAMBIO"
+  },
+  {
+    week:2, day:"VIE", funnel:"tofu", type:"Mito",
+    hook:"Las máquinas son para débiles o para rehabilitación. Falso.",
+    hook_full:"Las máquinas son para débiles o para cuando estás lesionado. Eso que te dijeron en el gym es falso.",
+    desarrollo:`Las máquinas son herramientas de hipertrofia muy válidas. En algunos casos, superiores al peso libre.
+
+¿Por qué? Porque estabilizan la carga, lo que te permite llevar el músculo objetivo hasta el fallo sin que otros músculos fallen antes.
+
+En un curl con mancuernas, el antebrazo o el agarre pueden ceder antes que el bíceps.
+En una máquina de curl, el bíceps es el limitante real.
+
+Para hipertrofia —que busca máximo estímulo en el músculo objetivo— eso es una ventaja, no una debilidad.
+
+Combinar peso libre y máquinas inteligentemente es lo que hacen los que realmente entienden el entrenamiento.`,
+    cta:"Seguime si querés aprender a usar todas las herramientas disponibles.",
+    keyword:"seguir"
+  },
+
+  // SEMANA 3 — MOFU heavy
+  {
+    week:3, day:"LUN", funnel:"mofu", type:"Educativo",
+    hook:"Rangos de repeticiones para hipertrofia: la verdad detrás del famoso 8-12.",
+    hook_full:"8 a 12 repeticiones para ganar músculo. ¿Es ley o mito? La respuesta que nadie te da.",
+    desarrollo:`No es ley. Pero tampoco es un mito.
+
+El rango de repeticiones no determina si crecés. Lo que determina si crecés es qué tan cerca del fallo llegás en esa serie.
+
+Podés hacer 5 repeticiones pesadas o 20 repeticiones livianas y crecer igual, siempre que el esfuerzo relativo sea alto en ambos casos.
+
+El rango 8-12 es popular porque permite buenos pesos, buena técnica y es sostenible en el tiempo. No porque sea mágico.
+
+Saber esto te libera del número y te permite enfocarte en lo que realmente importa: la intensidad relativa.`,
+    cta:"Mandame MASA si querés que te explique cómo estructurar tus series para maximizar el crecimiento.",
+    keyword:"MASA"
+  },
+  {
+    week:3, day:"MAR", funnel:"mofu", type:"Educativo",
+    hook:"Descanso entre series: ¿1 minuto, 3 minutos? Lo que dice la evidencia.",
+    hook_full:"¿Cuánto tenés que descansar entre series? 1 minuto, 3 minutos... La evidencia dice algo concreto.",
+    desarrollo:`El objetivo del descanso es llegar a la siguiente serie en condiciones de rendir igual o mejor que la anterior.
+
+Para ejercicios compuestos pesados —sentadilla, press, dominadas— 2 a 3 minutos son razonables.
+Para ejercicios de aislamiento, 60 a 90 segundos suele ser suficiente.
+
+Descansar poco te lleva fatigado a la próxima serie y el estímulo baja.
+Descansar demasiado alarga el entrenamiento sin beneficio extra.
+
+La señal real no es el cronómetro. Es cuándo sentís que podés rendir al nivel de la serie anterior.`,
+    cta:"Si querés que te ayude a estructurar tus entrenamientos, mandame CAMBIO.",
+    keyword:"CAMBIO"
+  },
+  {
+    week:3, day:"MIÉ", funnel:"mofu", type:"Educativo",
+    hook:"Sobrecarga progresiva: el principio que lo explica todo.",
+    hook_full:"Sobrecarga progresiva: el principio más importante del entrenamiento y el que más se ignora.",
+    desarrollo:`Tu cuerpo se adapta al estímulo que recibe. Si ese estímulo no cambia, el cuerpo no tiene razón para cambiar.
+
+Sobrecarga progresiva significa que con el tiempo aplicás más estímulo que antes.
+
+Eso no significa subir de peso obligatoriamente cada semana.
+
+Podés progresar haciendo más repeticiones con el mismo peso, agregando una serie, mejorando el rango de movimiento o acortando el descanso.
+
+Lo que no podés hacer es entrenar exactamente igual semana tras semana y esperar resultados distintos. El cuerpo es muy eficiente: se adapta y deja de necesitar cambiar.`,
+    cta:"Si llevás tiempo sin progresar, mandame MASA y miramos qué está pasando.",
+    keyword:"MASA"
+  },
+  {
+    week:3, day:"JUE", funnel:"mofu", type:"Educativo",
+    hook:"Drop sets y rest-pause: cuándo usarlos y cuándo son pérdida de tiempo.",
+    hook_full:"Drop sets, rest-pause, superseries... ¿realmente sirven o son para verse intenso en el gym?",
+    desarrollo:`Sirven. Pero solo si sabés cuándo y cómo usarlos.
+
+Las técnicas de intensificación son herramientas para agregar estímulo cuando ya no podés agregar más series directas.
+
+Un drop set bien ejecutado te da series adicionales efectivas en menos tiempo.
+Un rest-pause te permite seguir cerca del fallo sin descanso completo.
+
+El error es usarlas desde el primer ejercicio de cada entrenamiento como si fueran la base.
+
+Son el 10% final, no la estructura. Primero necesitás dominar el volumen y la intensidad estándar.`,
+    cta:"Mandame MASA si querés saber exactamente cómo y cuándo incorporar estas técnicas.",
+    keyword:"MASA"
+  },
+  {
+    week:3, day:"VIE", funnel:"tofu", type:"Relatable",
+    hook:"¿Cambiaste de rutina más veces este año que de ropa interior? Esto te va a sonar.",
+    hook_full:"¿Cuántas rutinas probaste este año? ¿Tres? ¿Cinco? ¿Una por mes? Esto te va a sonar.",
+    desarrollo:`Nada funciona dos semanas, buscás la siguiente rutina en YouTube, la probás dos semanas más, tampoco funciona, y así.
+
+El problema no es la rutina. Es que sin entender los principios básicos, cualquier rutina va a parecer que no funciona.
+
+Volume, intensidad, frecuencia, progresión. Esos son los cuatro pilares.
+
+Si no sabés si estás aplicando cada uno correctamente, da igual qué rutina uses.
+
+Entender los principios te hace independiente de cualquier programa. Podés armar el tuyo o adaptar cualquier otro.`,
+    cta:"Seguime. Eso es exactamente lo que enseño acá.",
+    keyword:"seguir"
+  },
+
+  // SEMANA 4 — MOFU + BOFU
+  {
+    week:4, day:"LUN", funnel:"mofu", type:"Educativo",
+    hook:"Técnica de ejercicios: no es estética. Es la razón por la que no sentís el músculo.",
+    hook_full:"La técnica no es para verse bien entrenando. Es para que el músculo que querés trabajar realmente reciba el estímulo.",
+    desarrollo:`Cuando la técnica falla, otros músculos compensan.
+
+Hacés remo y lo sentís todo en el bíceps en vez de la espalda.
+Hacés press de hombros y carga el trapecio en vez del deltoides.
+
+No es que estés débil. Es que el patrón de movimiento no está bien aprendido.
+
+Tres cosas definen una buena técnica: movilidad suficiente para el rango completo del ejercicio, control de la carga en todo el recorrido, y respiración correcta para generar tensión interna.
+
+Cuando eso está bien, el músculo objetivo es el que trabaja. Y el crecimiento sigue.`,
+    cta:"Si querés revisar tu técnica y ajustar tu entrenamiento, mandame CAMBIO.",
+    keyword:"CAMBIO"
+  },
+  {
+    week:4, day:"MAR", funnel:"mofu", type:"Educativo",
+    hook:"El cardio NO es el enemigo de la masa muscular. Hacerlo mal, sí.",
+    hook_full:"El cardio no destruye el músculo. Hacerlo mal, en el momento equivocado y en exceso, sí.",
+    desarrollo:`Cardio bien programado no interfiere con la ganancia muscular. De hecho, mejora tu recuperación y tu capacidad de entrenar con más intensidad a largo plazo.
+
+Lo que sí puede ser un problema: demasiado volumen de cardio, alta intensidad justo antes de la sesión de fuerza, o cardio excesivo en contexto de déficit calórico marcado.
+
+La clave es el tipo, el timing y la cantidad.
+
+Caminata, bici tranquila, remo suave después de entrenar fuerza o en días separados: perfectamente compatible con ganar músculo.
+
+HIIT todos los días antes de tu entrenamiento de pecho: ahí sí hay un problema.`,
+    cta:"Si querés saber cómo integrar el cardio sin comprometer tus resultados, mandame MASA.",
+    keyword:"MASA"
+  },
+  {
+    week:4, day:"MIÉ", funnel:"bofu", type:"Conversión",
+    hook:"¿Qué obtenés cuando trabajamos juntos? Te lo explico sin vueltas.",
+    hook_full:"¿Qué pasa exactamente cuando empezamos a trabajar juntos? Te lo explico sin vueltas.",
+    desarrollo:`Primero entendemos dónde estás: cuánto tiempo llevás entrenando, qué resultados tuviste, qué no funcionó y por qué.
+
+Después armo tu programa. No uno genérico. Uno diseñado para tu cuerpo, tu nivel, los días que podés entrenar y los ejercicios que podés hacer.
+
+Nutrición integrada: calorías, proteínas y distribución de macros adaptada a tu objetivo.
+
+Seguimiento semanal: ajustamos según cómo respondés. El programa evoluciona con vos.
+
+No necesitás un programa perfecto. Necesitás un sistema que puedas sostener y que tenga criterio detrás.
+
+Eso es lo que ofrezco.`,
+    cta:"Si estás listo para empezar a entrenar con método, mandame CAMBIO por DM y hablamos.",
+    keyword:"CAMBIO"
+  },
+  {
+    week:4, day:"JUE", funnel:"bofu", type:"Objeción / Conversión",
+    hook:"\"No tengo tiempo para entrenar 5 días por semana.\" No necesitás 5 días.",
+    hook_full:"\"No tengo tiempo para entrenar 5 días a la semana.\" Buenas noticias: no necesitás 5 días.",
+    desarrollo:`Con 3 sesiones semanales bien estructuradas podés ganar masa muscular de forma consistente.
+
+El problema no es la cantidad de días. Es la calidad de lo que hacés en esos días.
+
+3 días con volumen adecuado, intensidad real y progresión semana a semana supera a 5 días de entrenamiento sin criterio.
+
+Trabajo con hombres que tienen trabajo, familia y vida. Los programas que armo se adaptan a la realidad, no a un escenario ideal.
+
+Si podés poner 3 horas semanales, hay un sistema para vos.`,
+    cta:"Mandame CAMBIO por DM si querés que hablemos de cómo armar algo que funcione para tu vida.",
+    keyword:"CAMBIO"
+  },
+  {
+    week:4, day:"VIE", funnel:"bofu", type:"Cierre / Social proof",
+    hook:"Un año entrenando sin ver resultados. Seis meses trabajando juntos. Esto es lo que cambió.",
+    hook_full:"Un año entrenando sin resultados. Seis meses con método. Esto es lo que cambia cuando entrenás con criterio.",
+    desarrollo:`No te voy a mostrar una transformación de 30 días. Esas no existen —al menos no sin trucos de edición.
+
+Lo que sí pasa en 3 a 6 meses de trabajo serio: empezás a mover más peso, tu cuerpo empieza a cambiar de forma visible, y lo más importante, entendés lo que estás haciendo y por qué.
+
+Esa última parte es la que más importa. Porque cuando entendés, no necesitás depender de nadie para seguir progresando.
+
+El objetivo no es que trabajes conmigo para siempre. Es que en el proceso aprendas a entrenar solo.`,
+    cta:"Si querés empezar, mandame CAMBIO por DM. Hablamos, entiendo tu situación, y vemos si tiene sentido trabajar juntos.",
+    keyword:"CAMBIO"
+  }
+];
+
+// BUILD CALENDAR
+function buildCalendar() {
+  const panel = document.getElementById('cal');
+  const weeks = [1,2,3,4];
+  const days = ["LUN","MAR","MIÉ","JUE","VIE"];
+
+  let html = `<div style="padding:20px 20px 0">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--tofu)"></div> TOFU — Atracción (nuevos)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--mofu)"></div> MOFU — Nutrición (audiencia tibia)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bofu)"></div> BOFU — Conversión (listos para comprar)</div>
+    </div>
+    <div class="cal-grid"><div class="cal-label"></div>`;
+
+  days.forEach(d => html += `<div class="cal-label">${d}</div>`);
+  html += '</div>';
+
+  weeks.forEach(w => {
+    html += `<div class="week-row"><div class="week-label">SEMANA ${w}</div><div class="cal-grid"><div></div>`;
+    days.forEach(day => {
+      const p = posts.find(x => x.week===w && x.day===day);
+      if(p) {
+        const n = posts.indexOf(p)+1;
+        html += `<div class="cal-card ${p.funnel}" onclick="showScript(${n-1})">
+          <div class="cal-day">${day}</div>
+          <div class="cal-num ${p.funnel}">${String(n).padStart(2,'0')}</div>
+          <div class="cal-title">${p.hook.substring(0,45)}${p.hook.length>45?'…':''}</div>
+          <span class="cal-tag ${p.funnel}">${p.funnel.toUpperCase()}</span>
+        </div>`;
+      } else {
+        html += `<div></div>`;
+      }
+    });
+    html += '</div></div>';
+  });
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+// BUILD SCRIPTS
+function buildScripts() {
+  const panel = document.getElementById('scripts');
+  const funnels = [
+    { key:'tofu', icon:'🔵', title:'TOFU', desc:'Atracción · Para gente que aún no te conoce · Objetivo: reach y seguidores nuevos' },
+    { key:'mofu', icon:'🟡', title:'MOFU', desc:'Nutrición de audiencia · Para quien ya te sigue · Objetivo: confianza y autoridad' },
+    { key:'bofu', icon:'🔴', title:'BOFU', desc:'Conversión · Para quien está listo para comprar · Objetivo: DMs y clientes' }
+  ];
+
+  let html = '<div style="padding:20px 20px 0">';
+  funnels.forEach(f => {
+    const fps = posts.filter(p => p.funnel === f.key);
+    html += `<div class="funnel-section">
+      <div class="funnel-header">
+        <span class="funnel-icon">${f.icon}</span>
+        <div>
+          <div class="funnel-title ${f.key}">${f.title} <span style="font-size:16px;color:var(--muted);letter-spacing:1px">· ${fps.length} posts</span></div>
+          <div class="funnel-desc">${f.desc}</div>
+        </div>
+      </div>`;
+
+    fps.forEach(p => {
+      const idx = posts.indexOf(p);
+      const id = `sc-${idx}`;
+      html += `<div class="script-card ${p.funnel}" id="${id}">
+        <div class="sc-header" onclick="toggleScript('${id}')">
+          <div class="sc-num ${p.funnel}">${String(idx+1).padStart(2,'0')}</div>
+          <div class="sc-meta">
+            <div class="sc-hook">${p.hook}</div>
+            <div class="sc-tags">
+              <span class="sc-tag week">SEM ${p.week} · ${p.day}</span>
+              <span class="sc-tag type">${p.type}</span>
+            </div>
+          </div>
+          <span class="sc-toggle">+</span>
+        </div>
+        <div class="sc-body">
+          <div class="sc-divider"></div>
+          <div class="script-block">
+            <div class="sb-label ${p.funnel}">🎬 HOOK — primeras 3 seg</div>
+            <div class="sb-text">${p.hook_full}</div>
+          </div>
+          <div class="script-block">
+            <div class="sb-label ${p.funnel}">📢 DESARROLLO</div>
+            <div class="sb-text">${p.desarrollo.trim()}</div>
+          </div>
+          <div class="cta-box ${p.funnel}">
+            <div class="cta-label ${p.funnel}">💬 CTA ${p.keyword !== 'seguir' && p.keyword !== 'guardar' && p.keyword !== 'comentar' ? '· Keyword: '+p.keyword : '· '+p.keyword}</div>
+            <div class="cta-text">${p.cta}</div>
+          </div>
+          <button class="copy-btn" onclick="copyScript(${idx}, this)">📋 Copiar script</button>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+  });
+
+  html += '</div>';
+  panel.innerHTML = html;
+}
+
+function showTab(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toggleScript(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function showScript(idx) {
+  // switch to scripts tab and open the right card
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('scripts').classList.add('active');
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===1));
+  setTimeout(() => {
+    const el = document.getElementById(`sc-${idx}`);
+    if(el) { el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'center'}); }
+  }, 100);
+}
+
+function copyScript(idx, btn) {
+  const p = posts[idx];
+  const text = `HOOK:\n${p.hook_full}\n\nDESARROLLO:\n${p.desarrollo.trim()}\n\nCTA:\n${p.cta}`;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copiar script'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+buildCalendar();
+buildScripts();
+</script>
+</body>
+</html>
